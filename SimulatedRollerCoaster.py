@@ -4,7 +4,7 @@ import thread
 import sys
 import uuid
 import iothub_client
-from datetime import datetime, timedelta
+import datetime
 from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult
 from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubError, DeviceMethodReturnValue
 
@@ -43,71 +43,47 @@ def client_run(TRAINID, delay):
         client = iothub_client_init()
         print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
         message_counter = 0           
-        currenttime = datetime.now()
+        firsttime = datetime.datetime.now()
 
         while True:
             print ( "Train %s start ride") % TRAINID
-            
+            secondtime = datetime.datetime.now()
+
+            if (secondtime - firsttime).seconds > 19 and (secondtime - firsttime).seconds <= 20 :
+                firsttime = secondtime
+                msg_EVENT2 = EVENTS_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), random.randint(0,50), "RideEnd", secondtime.strftime("%Y-%m-%dT%H:%M:%SZ") )
+                message_EVENT2 = IoTHubMessage(msg_EVENT2)
+                client.send_event_async(message_EVENT2, send_confirmation_callback, message_counter)
+                print ( "IoTHubClient.send_event_async accepted message [%d] for transmission to IoT Hub." % message_counter )
+                message_counter += 1
+
             msg_GPS = GPS_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), round(random.uniform(0, 100), 4), round(random.uniform(-100, 100), 4),
-            round(random.uniform(0, 300), 2), round(random.uniform(0, 10), 2), random.randint(0,10), random.randint(0,50), str(currenttime) )
-            msg_ACCE = ACCE_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), round(random.uniform(0, 1)), round(random.uniform(0, 3)), round(random.uniform(0, 2)), str(currenttime) )
-            msg_EVENT1 = EVENTS_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), random.randint(0,50), "RideStart", str(currenttime) )
-            msg_EVENT2 = EVENTS_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), random.randint(0,50), "RideEnd", str(currenttime+timedelta(minutes=1)) )
-            msg_EVENT3 = EVENTS_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), random.randint(0,50), "PhotoTriggered", str(currenttime+timedelta(seconds=30)) )
-
-            currenttime = currenttime + timedelta(minutes=1)
-            currenttime = currenttime + timedelta(seconds=20)
-
+            round(random.uniform(0, 300), 2), round(random.uniform(0, 10), 2), random.randint(0,10), random.randint(0,50), secondtime.strftime("%Y-%m-%dT%H:%M:%SZ") )
             message_GPS = IoTHubMessage(msg_GPS)
-            message_ACCE = IoTHubMessage(msg_ACCE)
-            message_EVENT1 = IoTHubMessage(msg_EVENT1)
-            message_EVENT2 = IoTHubMessage(msg_EVENT2)
-            message_EVENT3 = IoTHubMessage(msg_EVENT3)
-
             client.send_event_async(message_GPS, send_confirmation_callback, message_counter)
             print ( "IoTHubClient.send_event_async accepted message [%d] for transmission to IoT Hub." % message_counter )
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
-            time.sleep(delay)
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
             message_counter += 1
 
+            msg_ACCE = ACCE_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), round(random.uniform(0, 1)), round(random.uniform(0, 3)), round(random.uniform(0, 2)), secondtime.strftime("%Y-%m-%dT%H:%M:%SZ") )
+            message_ACCE = IoTHubMessage(msg_ACCE)
             client.send_event_async(message_ACCE, send_confirmation_callback, message_counter)
             print ( "IoTHubClient.send_event_async accepted message [%d] for transmission to IoT Hub." % message_counter )
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
-            time.sleep(delay)
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
             message_counter += 1
 
+            msg_EVENT1 = EVENTS_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), random.randint(0,50), "RideStart", secondtime.strftime("%Y-%m-%dT%H:%M:%SZ") )
+            message_EVENT1 = IoTHubMessage(msg_EVENT1)
             client.send_event_async(message_EVENT1, send_confirmation_callback, message_counter)
             print ( "IoTHubClient.send_event_async accepted message [%d] for transmission to IoT Hub." % message_counter )
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
-            time.sleep(delay)
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
             message_counter += 1
+            
+            if (secondtime - firsttime).seconds > 4 and (secondtime - firsttime).seconds <= 6 :
+                msg_EVENT3 = EVENTS_DATA % (str(uuid.uuid4()), TRAINID, str(uuid.uuid4()), random.randint(0,50), "PhotoTriggered", secondtime.strftime("%Y-%m-%dT%H:%M:%SZ") )
+                message_EVENT3 = IoTHubMessage(msg_EVENT3)
+                client.send_event_async(message_EVENT3, send_confirmation_callback, message_counter)
+                print ( "IoTHubClient.send_event_async accepted message [%d] for transmission to IoT Hub." % message_counter )
+                message_counter += 1 
 
-            client.send_event_async(message_EVENT2, send_confirmation_callback, message_counter)
-            print ( "IoTHubClient.send_event_async accepted message [%d] for transmission to IoT Hub." % message_counter )
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
             time.sleep(delay)
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
-            message_counter += 1
-
-            client.send_event_async(message_EVENT3, send_confirmation_callback, message_counter)
-            print ( "IoTHubClient.send_event_async accepted message [%d] for transmission to IoT Hub." % message_counter )
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
-            time.sleep(delay)
-            status = client.get_send_status()
-            print ( "Send status: %s" % status )
-            message_counter += 1
 
     except IoTHubError as iothub_error:
         print ( "Unexpected error %s from IoTHub" % iothub_error )
@@ -121,7 +97,7 @@ def iothub_client_telemetry_sample_run():
     # for i in range(1, 5) :
     #     TRAINID[i] = str(uuid.uuid4())
     #     client_run(TRAINID[i], 30)
-    client_run(str(uuid.uuid4()), 30)
+    client_run(str(uuid.uuid4()), 5)
         
     
 if __name__ == '__main__':

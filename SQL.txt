@@ -1,0 +1,15 @@
+SELECT trainId, rideId, passengerCount, eventType, deviceTime
+INTO
+    outputBI
+FROM
+    input2
+WHERE
+    passengerCount is not NULL
+
+SELECT trainId, rideId, passengerCount, eventType, deviceTime
+INTO
+    outputblob
+FROM
+    input2
+WHERE
+    passengerCount is not NULL
