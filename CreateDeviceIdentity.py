@@ -4,7 +4,7 @@ from iothub_service_client import IoTHubRegistryManager, IoTHubRegistryManagerAu
 from iothub_service_client import IoTHubDeviceStatus, IoTHubError
 
 #parameters
-CONNECTION_STRING = "HostName=iotzwj.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=tHGymaOica7AhL+NncG4bSmwhf0fVOUmT7vmWsMrXhY="
+CONNECTION_STRING = "[]"
 DEVICE_ID = "visitorDevice1"
 
 #print device info
