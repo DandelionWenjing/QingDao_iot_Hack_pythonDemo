@@ -1,6 +1,6 @@
-# QingDao_iot_OpenHack_pythonDemo  
+# QingDao_iot_Hack_pythonDemo  
 
-该demo为[QingDao_iot_Openhack](https://github.com/Nick287/IoT-Hastfest-Qingdao)挑战的参考
+该demo为[QingDao_iot_hack](https://github.com/Nick287/IoT-Hastfest-Qingdao)挑战的参考
 
 ## 挑战1
 
